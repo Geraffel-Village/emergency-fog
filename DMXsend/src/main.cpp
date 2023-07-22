@@ -31,25 +31,24 @@ const int GreenPin = 6; // PWM output pin for Green Light.
 const int BluePin = 5; // PWM output pin for Blue Light.
 
 const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
+const int Button1Pin = 13;
 
 // The color fading pattern
 
-int RedList[] = {255, 128, 0, 0, 0, 128};
-int GreenList[] = {0, 128, 255, 128, 0, 0};
-int BlueList[] = {0, 0, 0, 128, 255, 128};
+int GreenList[] = {64, 128, 255, 255,   0,   0};
+int BlueList[] =  {64,   0,   0, 255, 255, 128};
 
 int RedLevel, GreenLevel, BlueLevel;
 
-int RedNow = 0;
-int GreenNow = 0;
-int BlueNow = 0;
-
 int state = 0;
+int buttonState = 0;        // current state of the button
+int lastButtonState = 0;    // previous state of the button
 
 void setup() {
   DMXSerial.init(DMXController);
 
   pinMode(OutputEnable, OUTPUT);
+  pinMode(Button1Pin, INPUT_PULLUP);
   pinMode(RedPin, OUTPUT); // sets the digital pin as output
   pinMode(GreenPin, OUTPUT);
   pinMode(BluePin, OUTPUT);
@@ -60,31 +59,37 @@ void setup() {
 void loop() {
   digitalWrite(OutputEnable, HIGH);
 
-  RedLevel = RedList[state];
   GreenLevel = GreenList[state];
   BlueLevel = BlueList[state];
 
-  if ((RedLevel == RedNow) && (GreenLevel == GreenNow) && (BlueLevel == BlueNow)) {
-    state += 1;
+  buttonState = digitalRead(Button1Pin);
+
+  // compare the buttonState to its previous state
+  if (buttonState != lastButtonState) {
+    // if the state has changed, increment the counter
+    if (buttonState == HIGH) {
+      // if the current state is HIGH then the button went from off to on:
+//      buttonPushCounter++;
+      // Serial.println("on");
+      // Serial.print("number of button pushes: ");
+      // Serial.println(buttonPushCounter);
+    } else {
+      // if the current state is LOW then the button went from on to off:
+      // Serial.println("off");
+    }
+    // Delay a little bit to avoid bouncing
+//    delay(50);
+  }
+  // save the current state as the last state, for next time through the loop
+  lastButtonState = buttonState;
+
+if (buttonState == HIGH) {
+  DMXSerial.write(3, 0);
+} else {
+  DMXSerial.write(3, 1);
+}
+//    state += 1;
     if (state == 6)
       state = 0;
 
-  } else {
-    if (RedNow < RedLevel) RedNow++;
-    if (RedNow > RedLevel) RedNow--;
-  //  DMXSerial.write(1, RedNow);
-    analogWrite(RedPin, RedNow);
-
-    if (GreenNow < GreenLevel) GreenNow++;
-    if (GreenNow > GreenLevel) GreenNow--;
-    DMXSerial.write(2, GreenNow);
-    analogWrite(GreenPin, GreenNow);
-
-    if (BlueNow < BlueLevel) BlueNow++;
-    if (BlueNow > BlueLevel) BlueNow--;
-    DMXSerial.write(3, BlueNow);
-    analogWrite(BluePin, BlueNow);
-  } // if
-
-  delayMicroseconds(5000); // wait a little bit
 } // loop
