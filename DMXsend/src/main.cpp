@@ -30,6 +30,8 @@ const int RedPin = 9; // PWM output pin for Red Light.
 const int GreenPin = 6; // PWM output pin for Green Light.
 const int BluePin = 5; // PWM output pin for Blue Light.
 
+const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
+
 // The color fading pattern
 
 int RedList[] = {255, 128, 0, 0, 0, 128};
@@ -47,6 +49,7 @@ int state = 0;
 void setup() {
   DMXSerial.init(DMXController);
 
+  pinMode(OutputEnable, OUTPUT);
   pinMode(RedPin, OUTPUT); // sets the digital pin as output
   pinMode(GreenPin, OUTPUT);
   pinMode(BluePin, OUTPUT);
@@ -55,6 +58,8 @@ void setup() {
 
 // loop through the rainbow colors
 void loop() {
+  digitalWrite(OutputEnable, HIGH);
+
   RedLevel = RedList[state];
   GreenLevel = GreenList[state];
   BlueLevel = BlueList[state];
@@ -67,7 +72,7 @@ void loop() {
   } else {
     if (RedNow < RedLevel) RedNow++;
     if (RedNow > RedLevel) RedNow--;
-    DMXSerial.write(1, RedNow);
+  //  DMXSerial.write(1, RedNow);
     analogWrite(RedPin, RedNow);
 
     if (GreenNow < GreenLevel) GreenNow++;
@@ -81,5 +86,5 @@ void loop() {
     analogWrite(BluePin, BlueNow);
   } // if
 
-  delayMicroseconds(2000); // wait a little bit
+  delayMicroseconds(5000); // wait a little bit
 } // loop
