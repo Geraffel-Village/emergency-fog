@@ -16,6 +16,10 @@
 // 28.12.2011 changed to channels 1..3 (RGB) for compatibility with the DmxSerialSend sample.
 // 10.05.2012 added some lines to loop to show how to fall back to a default color when no data was received since some time.
 // - - - - -
+/* 
+ * with modifications for cqrobot-DMXShield
+ */
+
 
 #include <Arduino.h>
 #include <DMXSerial.h>
@@ -26,12 +30,10 @@ const int RedPin = 9; // PWM output pin for Red Light.
 const int GreenPin = 6; // PWM output pin for Green Light.
 const int BluePin = 5; // PWM output pin for Blue Light.
 
+const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
+
 // This Example receives the 3 values starting with this channel:
 const int startChannel = 0 * 3 + 1;
-
-#define RedDefaultLevel 100
-#define GreenDefaultLevel 200
-#define BlueDefaultLevel 255
 
 void setup() {
   DMXSerial.init(DMXReceiver);
@@ -45,24 +47,25 @@ void setup() {
   pinMode(RedPin, OUTPUT); // sets the digital pin as output
   pinMode(GreenPin, OUTPUT);
   pinMode(BluePin, OUTPUT);
+  pinMode(OutputEnable, OUTPUT);
 }
 
 
 void loop() {
+  digitalWrite(OutputEnable, LOW);
+
   // Calculate how long no data bucket was received
   unsigned long lastPacket = DMXSerial.noDataSince();
 
   if (lastPacket < 5000) {
+    digitalWrite(RedPin, LOW);
     // read recent DMX values and set pwm levels
-    analogWrite(RedPin, DMXSerial.read(startChannel));
     analogWrite(GreenPin, DMXSerial.read(startChannel + 1));
     analogWrite(BluePin, DMXSerial.read(startChannel + 2));
 
   } else {
     // Show pure red color, when no data was received since 5 seconds or more.
-    analogWrite(RedPin, RedDefaultLevel);
-    analogWrite(GreenPin, GreenDefaultLevel);
-    analogWrite(BluePin, BlueDefaultLevel);
+    digitalWrite(RedPin, HIGH);
   } // if
 }
 
