@@ -47,10 +47,10 @@ void set_output_dmx() {
     switch(i) {
     case FogChannel:
       analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
-      if (button_active) {
-        dmx_transceiver->set_dmx_value(FogChannel, 128);
-      } else {
+      if (! button_active) {
         dmx_transceiver->set_dmx_value(FogChannel, dmx_transceiver->get_dmx_value(FogChannel));
+      } else {
+        dmx_transceiver->set_dmx_value(FogChannel, 128);
       }
     }
   }
