@@ -63,7 +63,8 @@ void loop() {
   //  returns when a packet is received or after a timeout
   dmx_transceiver->receive();
 
-  button_pressed = digitalRead(BUTTON1_PIN);
+  // high = button open/not pressed
+  button_pressed = ! digitalRead(BUTTON1_PIN);
   if (button_pressed)
     analogWrite(RedPin, 200);
   else
