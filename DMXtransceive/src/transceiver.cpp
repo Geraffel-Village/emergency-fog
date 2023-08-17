@@ -46,10 +46,14 @@ void set_output_dmx() {
   for(int i = 1; i <= 512; i++) {
     switch(i) {
     case FogChannel:
-      dmx_transceiver->set_dmx_value(FogChannel, 128);
       analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
+      if (button_pressed) {
+        dmx_transceiver->set_dmx_value(FogChannel, 128);
+      } else {
+        dmx_transceiver->set_dmx_value(FogChannel, 0);
+      }
     }
-    }
+  }
 }
 
 void loop() {
@@ -60,12 +64,13 @@ void loop() {
   dmx_transceiver->receive();
 
   button_pressed = digitalRead(BUTTON1_PIN);
+  if (button_pressed)
+    analogWrite(RedPin, 200);
+  else
+    analogWrite(RedPin,0);
 
   //  forward all incoming dmx packets to the output
   set_output_dmx();
-
-  //  alter the output
-//  alter_output_dmx();
 
   //  transmit the output
   dmx_transceiver->transmit();
