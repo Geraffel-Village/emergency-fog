@@ -19,7 +19,7 @@ const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
 const int FogChannel = 255;
 
 //  listener channel
-uint16_t listener_channel = 511;
+//uint16_t listener_channel = 511;
 
 void setup() {
   //  initialize a new transceiver instance
@@ -36,24 +36,22 @@ void setup() {
 }
 
 
-//  forward all incoming to out
-void set_output_dmx() {
-  for(int i = 1; i <= 512; i++) {
-      dmx_transceiver->set_dmx_value(i, dmx_transceiver->get_dmx_value(i));
-    }
-  analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
-}
-
-//  if channel "listener_channel" >= 250, channel 1 will be HIGH
-//  if channel "listener_channel" < 250, channel 1 will be LOW
-void alter_output_dmx() {
-  if(dmx_transceiver->get_dmx_value(listener_channel) >= 250) {
-    dmx_transceiver->set_dmx_value(1, 255);
-  }else {
-    dmx_transceiver->set_dmx_value(1, 0);
+int alter_output_dmx(int channel, int value) {
+  switch(channel) {
+  case FogChannel:
+    dmx_transceiver->set_dmx_value(FogChannel, 255);
+    analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
   }
 }
 
+
+//  forward all incoming to out
+void set_output_dmx() {
+  for(int i = 1; i <= 512; i++) {
+//      dmx_transceiver->set_dmx_value(i, alter_output_dmx(i,dmx_transceiver->get_dmx_value(i)));
+      dmx_transceiver->set_dmx_value(i, 128);
+    }
+}
 
 void loop() {
   // put your main code here, to run repeatedly:
