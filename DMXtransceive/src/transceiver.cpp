@@ -19,7 +19,7 @@ const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
 // This Example receives the 3 values starting with this channel:
 const int FogChannel = 255;
 
-bool button_pressed;
+unsigned long button_pressed;
 
 void setup() {
   //  initialize a new transceiver instance
@@ -36,7 +36,7 @@ void setup() {
 
   //configure pin 13 as an input and enable the internal pull-up resistor
   pinMode(BUTTON1_PIN, INPUT_PULLUP);
-  button_pressed = false;
+  button_pressed = 0;
 }
 
 
@@ -64,7 +64,12 @@ void loop() {
   dmx_transceiver->receive();
 
   // high = button open/not pressed
-  button_pressed = ! digitalRead(BUTTON1_PIN);
+  if (digitalRead(BUTTON1_PIN) == false) {
+    button_pressed = millis() ;
+  } else {
+    button_pressed = 0;
+  }
+
   if (button_pressed)
     analogWrite(RedPin, 200);
   else
