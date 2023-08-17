@@ -16,7 +16,7 @@ const int BluePin = 5; // PWM output pin for Blue Light.
 const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
 
 // This Example receives the 3 values starting with this channel:
-const int startChannel = 0 * 3 + 1;
+const int FogChannel = 255;
 
 //  listener channel
 uint16_t listener_channel = 511;
@@ -41,8 +41,7 @@ void set_output_dmx() {
   for(int i = 1; i <= 512; i++) {
       dmx_transceiver->set_dmx_value(i, dmx_transceiver->get_dmx_value(i));
     }
-  analogWrite(GreenPin, dmx_transceiver->get_dmx_value(startChannel + 1));
-  analogWrite(BluePin, dmx_transceiver->get_dmx_value(startChannel + 2));
+  analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
 }
 
 //  if channel "listener_channel" >= 250, channel 1 will be HIGH
