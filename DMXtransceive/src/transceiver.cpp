@@ -10,6 +10,13 @@
 // transceiver instance best to be pointer
 DMX_Transceiver *dmx_transceiver;
 
+const int RedPin = 9; // PWM output pin for Red Light.
+const int GreenPin = 6; // PWM output pin for Green Light.
+const int BluePin = 5; // PWM output pin for Blue Light.
+const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
+
+// This Example receives the 3 values starting with this channel:
+const int startChannel = 0 * 3 + 1;
 
 //  listener channel
 uint16_t listener_channel = 511;
@@ -20,14 +27,22 @@ void setup() {
   dmx_transceiver->set_rx_enable_pin(RX_ENABLE_PIN);
   dmx_transceiver->set_tx_enable_pin(TX_ENABLE_PIN);
   dmx_transceiver->init();  
+
+  // enable pwm outputs
+  pinMode(RedPin, OUTPUT); // sets the digital pin as output
+  pinMode(GreenPin, OUTPUT);
+  pinMode(BluePin, OUTPUT);
+  pinMode(OutputEnable, OUTPUT);
 }
 
 
 //  forward all incoming to out
 void set_output_dmx() {
   for(int i = 1; i <= 512; i++) {
-      dmx_transceiver->set_dmx_value(i, dmx_transceiver->get_dmx_value(i));
+      dmx_transceiver->set_dmx_value(i, dmx_transceiver->get_dmx_value(i)/8);
     }
+  analogWrite(GreenPin, dmx_transceiver->get_dmx_value(startChannel + 1));
+  analogWrite(BluePin, dmx_transceiver->get_dmx_value(startChannel + 2));
 }
 
 //  if channel "listener_channel" >= 250, channel 1 will be HIGH
@@ -53,8 +68,8 @@ void loop() {
   set_output_dmx();
 
   //  alter the output
-  alter_output_dmx();
-  
-  //  transmit the output      
+//  alter_output_dmx();
+
+  //  transmit the output
   dmx_transceiver->transmit();
 }
