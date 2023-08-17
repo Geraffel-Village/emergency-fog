@@ -50,7 +50,7 @@ void set_output_dmx() {
       if (button_pressed) {
         dmx_transceiver->set_dmx_value(FogChannel, 128);
       } else {
-        dmx_transceiver->set_dmx_value(FogChannel, 0);
+        dmx_transceiver->set_dmx_value(FogChannel, dmx_transceiver->get_dmx_value(FogChannel));
       }
     }
   }
