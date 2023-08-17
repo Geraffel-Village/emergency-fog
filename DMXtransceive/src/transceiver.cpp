@@ -6,6 +6,7 @@
 //  the pins that will be set HIGH when in that mode (for max485 module)
 #define RX_ENABLE_PIN 6
 #define TX_ENABLE_PIN 5
+#define BUTTON1_PIN 13
 
 // transceiver instance best to be pointer
 DMX_Transceiver *dmx_transceiver;
@@ -18,8 +19,7 @@ const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
 // This Example receives the 3 values starting with this channel:
 const int FogChannel = 255;
 
-//  listener channel
-//uint16_t listener_channel = 511;
+bool button_pressed;
 
 void setup() {
   //  initialize a new transceiver instance
@@ -33,23 +33,22 @@ void setup() {
   pinMode(GreenPin, OUTPUT);
   pinMode(BluePin, OUTPUT);
   pinMode(OutputEnable, OUTPUT);
+
+  //configure pin 13 as an input and enable the internal pull-up resistor
+  pinMode(BUTTON1_PIN, INPUT_PULLUP);
+  button_pressed = false;
 }
 
-
-int alter_output_dmx(int channel, int value) {
-  switch(channel) {
-  case FogChannel:
-    dmx_transceiver->set_dmx_value(FogChannel, 255);
-    analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
-  }
-}
 
 
 //  forward all incoming to out
 void set_output_dmx() {
   for(int i = 1; i <= 512; i++) {
-//      dmx_transceiver->set_dmx_value(i, alter_output_dmx(i,dmx_transceiver->get_dmx_value(i)));
-      dmx_transceiver->set_dmx_value(i, 128);
+    switch(i) {
+    case FogChannel:
+      dmx_transceiver->set_dmx_value(FogChannel, 128);
+      analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
+    }
     }
 }
 
@@ -60,6 +59,7 @@ void loop() {
   //  returns when a packet is received or after a timeout
   dmx_transceiver->receive();
 
+  button_pressed = digitalRead(BUTTON1_PIN);
 
   //  forward all incoming dmx packets to the output
   set_output_dmx();
