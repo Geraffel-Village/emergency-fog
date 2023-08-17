@@ -39,7 +39,7 @@ void setup() {
 //  forward all incoming to out
 void set_output_dmx() {
   for(int i = 1; i <= 512; i++) {
-      dmx_transceiver->set_dmx_value(i, dmx_transceiver->get_dmx_value(i)/8);
+      dmx_transceiver->set_dmx_value(i, dmx_transceiver->get_dmx_value(i));
     }
   analogWrite(GreenPin, dmx_transceiver->get_dmx_value(startChannel + 1));
   analogWrite(BluePin, dmx_transceiver->get_dmx_value(startChannel + 2));
