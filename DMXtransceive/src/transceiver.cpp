@@ -48,7 +48,7 @@ void set_output_dmx() {
   for(int i = 1; i <= 512; i++) {
     switch(i) {
     case FogChannel:
-      const unsigned long ACTIVITY_EXTENSION = 15 * 1000; // 15 seconds
+      const unsigned long ACTIVITY_EXTENSION = 1000 * 30; // 30 seconds
       analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
       if ( (button_active) or ( (millis() - button_lastactive_ts) < ACTIVITY_EXTENSION) ) {
         dmx_transceiver->set_dmx_value(FogChannel, 255);
