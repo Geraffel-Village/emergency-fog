@@ -7,6 +7,7 @@
 #define RX_ENABLE_PIN 6
 #define TX_ENABLE_PIN 5
 #define BUTTON1_PIN 13
+#define BUTTON2_PIN 12
 
 // transceiver instance best to be pointer
 DMX_Transceiver *dmx_transceiver;
@@ -19,7 +20,7 @@ const int OutputEnable = 2 ; // Enable the output of the cqrobot-DMXShield
 // This Example receives the 3 values starting with this channel:
 const int FogChannel = 255;
 
-bool button_active;
+bool button1_active, button2_active;
 unsigned long button_lastactive_ts;
 
 void setup() {
@@ -37,7 +38,9 @@ void setup() {
 
   //configure pin 13 as an input and enable the internal pull-up resistor
   pinMode(BUTTON1_PIN, INPUT_PULLUP);
-  button_active = false;
+  pinMode(BUTTON2_PIN, INPUT_PULLUP);
+  button1_active = false;
+  button2_active = false;
   button_lastactive_ts = 0;
 }
 
@@ -50,8 +53,10 @@ void set_output_dmx() {
     case FogChannel:
       const unsigned long ACTIVITY_EXTENSION = 1000 * 30; // 30 seconds
       analogWrite(GreenPin, dmx_transceiver->get_dmx_value(FogChannel));
-      if ( (button_active) or ( (millis() - button_lastactive_ts) < ACTIVITY_EXTENSION) ) {
+      if ( button1_active or (millis() - button_lastactive_ts) < ACTIVITY_EXTENSION) {
         dmx_transceiver->set_dmx_value(FogChannel, 255);
+      } else if ( button2_active or ( (millis() - button_lastactive_ts) < ACTIVITY_EXTENSION) ) {
+        dmx_transceiver->set_dmx_value(FogChannel, 32);
       } else {
         dmx_transceiver->set_dmx_value(FogChannel, dmx_transceiver->get_dmx_value(FogChannel));
       }
@@ -67,14 +72,19 @@ void loop() {
   dmx_transceiver->receive();
 
   // high = button open/not pressed
-  if (digitalRead(BUTTON1_PIN) == false) {
-    button_active = true;
+  if ( (digitalRead(BUTTON1_PIN) == false) or (digitalRead(BUTTON2_PIN) == false) ) {
+    if (digitalRead(BUTTON1_PIN) == false) {
+      button1_active = true;
+  } else {
+        button2_active = true;
+  }
     button_lastactive_ts = millis();
   } else {
-    button_active = false;
+    button1_active = false;
+    button2_active = false;
   }
 
-  if (button_active)
+  if (button1_active)
     analogWrite(RedPin, 200);
   else
     analogWrite(RedPin,0);
